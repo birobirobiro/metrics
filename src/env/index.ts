@@ -7,6 +7,8 @@ const envSchema = z.object({
   YOUTUBE_API_KEY: z.string(),
   GITHUB_API_KEY: z.string(),
   DISCORD_API_KEY: z.string(),
+  TWITCH_CLIENT_ID: z.string(),
+  TWITCH_API_KEY: z.string(),
   PORT: z.coerce.number().default(3333),
 })
 

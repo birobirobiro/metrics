@@ -1,22 +1,34 @@
 import fastify, { FastifyReply, FastifyRequest } from 'fastify'
-import { getChannelInfos } from './lib/youtube'
-import { getUserInfos } from './lib/github'
-import { getGuildInfo } from './lib/discord'
+import { discordDataSchema, getDiscordGuildInfo } from './lib/discord'
+import { getGithubUserInfos, githubDataSchema } from './lib/github'
+import { getTwitchUserInfos, twitchDataSchema } from './lib/twitch'
+import {
+  YoutubeData,
+  getYoutubeChannelInfos,
+  youtubeDataSchema,
+} from './lib/youtube'
 
 export const app = fastify()
 
 app.get(
   '/youtube/:channelId',
-  async (req: FastifyRequest<{ Params: youtubeParams }>, res: FastifyReply) => {
+  async (
+    req: FastifyRequest<{ Params: { channelId: string } }>,
+    res: FastifyReply,
+  ) => {
     const channelId: string = req.params.channelId
 
     if (!channelId) {
       return res.status(400).send()
     }
 
-    const data = (await getChannelInfos(channelId)) as youtubeData
+    const data = (await getYoutubeChannelInfos(channelId)) as YoutubeData
 
-    if (!data || data.pageInfo.totalResults <= 0) {
+    if (
+      !data ||
+      data.pageInfo.totalResults <= 0 ||
+      isYoutubeData(data) === false
+    ) {
       return res
         .status(404)
         .send({ success: false, channelId, message: 'No data found' })
@@ -28,20 +40,19 @@ app.get(
 
 app.get(
   '/github/:username',
-  async (req: FastifyRequest<{ Params: githubParams }>, res: FastifyReply) => {
+  async (
+    req: FastifyRequest<{ Params: { username: string } }>,
+    res: FastifyReply,
+  ) => {
     const username: string = req.params.username
 
     if (!username) {
       return res.status(400).send()
     }
 
-    const data = await getUserInfos(username)
+    const data = await getGithubUserInfos(username)
 
-    if (isGitHubData(data) === false) {
-      res.status(401).send({ success: false, message: 'Unauthorized' })
-    }
-
-    if (!data || !isGitHubData(data)) {
+    if (!data || isGithubData(data) === false) {
       return res
         .status(404)
         .send({ success: false, username, message: 'No data found' })
@@ -53,16 +64,19 @@ app.get(
 
 app.get(
   '/discord/:guildId',
-  async (req: FastifyRequest<{ Params: discordParams }>, res: FastifyReply) => {
+  async (
+    req: FastifyRequest<{ Params: { guildId: string } }>,
+    res: FastifyReply,
+  ) => {
     const guildId: string = req.params.guildId
 
     if (!guildId) {
       return res.status(400).send()
     }
 
-    const data = await getGuildInfo(guildId)
+    const data = await getDiscordGuildInfo(guildId)
 
-    if (!data || !isDiscordData(data)) {
+    if (!data || isDiscordData(data) === false) {
       res
         .status(404)
         .send({ success: false, guildId, message: 'No data found' })
@@ -72,32 +86,64 @@ app.get(
   },
 )
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isGitHubData(obj: any): obj is githubData {
-  if (
-    obj?.message ===
-    'Error getting user information: Request failed with status code 401'
-  )
-    return false
+app.get(
+  '/twitch/:userid',
+  async (
+    req: FastifyRequest<{ Params: { userid: string } }>,
+    res: FastifyReply,
+  ) => {
+    const userid: string = req.params.userid
 
-  return (
-    typeof obj?.login === 'string' &&
-    typeof obj?.id === 'number' &&
-    typeof obj?.node_id === 'string' &&
-    typeof obj?.url === 'string' &&
-    typeof obj?.html_url === 'string' &&
-    typeof obj?.followers === 'number' &&
-    typeof obj?.name === 'string'
-    // only important informations
-  )
+    if (!userid) {
+      return res.status(400).send()
+    }
+
+    const info = await getTwitchUserInfos(userid)
+
+    if (!info) {
+      return res
+        .status(404)
+        .send({ success: false, userid, message: 'No data found' })
+    }
+
+    const data = info.data
+
+    if (!data || isTwitchData(data) === false) {
+      return res
+        .status(404)
+        .send({ success: false, userid, message: 'No data found' })
+    }
+
+    res.send({
+      success: true,
+      info: {
+        ...data,
+        followers: info.followers,
+      },
+    })
+  },
+)
+
+function isYoutubeData(data: unknown) {
+  const parsedData = youtubeDataSchema.safeParse(data)
+
+  return parsedData.success
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isDiscordData(obj: any): obj is discordData {
-  return (
-    typeof obj?.id === 'string' &&
-    typeof obj?.name === 'string' &&
-    typeof obj?.owner_id === 'string' &&
-    typeof obj?.approximate_member_count === 'number'
-  ) // only important informations
+function isTwitchData(data: unknown) {
+  const parsedData = twitchDataSchema.safeParse(data)
+
+  return parsedData.success
+}
+
+function isGithubData(data: unknown) {
+  const parsedData = githubDataSchema.safeParse(data)
+
+  return parsedData.success
+}
+
+function isDiscordData(data: unknown) {
+  const parsedData = discordDataSchema.safeParse(data)
+
+  return parsedData.success
 }

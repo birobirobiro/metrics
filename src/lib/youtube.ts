@@ -1,12 +1,13 @@
 import { env } from '@/env'
 import { google } from 'googleapis'
+import { z } from 'zod'
 
 const youtube = google.youtube({
   version: 'v3',
   auth: env.YOUTUBE_API_KEY,
 })
 
-export async function getChannelInfos(channelId: string) {
+export async function getYoutubeChannelInfos(channelId: string) {
   console.log('Getting channel infos for channel:', channelId)
 
   return new Promise((resolve, reject) => {
@@ -30,8 +31,51 @@ export async function getChannelInfos(channelId: string) {
           return
         }
 
-        resolve(response.data)
+        const data = youtubeDataSchema.parse(response.data)
+
+        resolve(data)
       },
     )
   })
 }
+
+export const youtubeDataSchema = z.object({
+  pageInfo: z.object({ totalResults: z.number() }),
+  items: z
+    .object({
+      id: z.string(),
+      snippet: z.object({
+        title: z.string(),
+        description: z.string(),
+        customUrl: z.string(),
+        publishedAt: z.string(),
+        thumbnails: z.object({
+          default: z.object({
+            url: z.string(),
+            width: z.number(),
+            height: z.number(),
+          }),
+          medium: z.object({
+            url: z.string(),
+            width: z.number(),
+            height: z.number(),
+          }),
+          high: z.object({
+            url: z.string(),
+            width: z.number(),
+            height: z.number(),
+          }),
+        }),
+        country: z.string(),
+      }),
+      statistics: z.object({
+        viewCount: z.string(),
+        subscriberCount: z.string(),
+        hiddenSubscriberCount: z.boolean(),
+        videoCount: z.string(),
+      }),
+    })
+    .array(),
+})
+
+export type YoutubeData = z.infer<typeof youtubeDataSchema>

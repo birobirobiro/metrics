@@ -72,6 +72,7 @@ app.get(
   },
 )
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isGitHubData(obj: any): obj is githubData {
   if (
     obj?.message ===

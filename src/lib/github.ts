@@ -6,7 +6,7 @@ export async function getUserInfos(username: string) {
 
   try {
     const response: AxiosResponse = await axios.get(
-      `https://api.github.com/users/${username}?with_counts=true`,
+      `https://api.github.com/users/${username}`,
       {
         headers: {
           Authorization: `Bearer ${env.GITHUB_API_KEY}`,

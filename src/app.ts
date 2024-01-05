@@ -1,6 +1,7 @@
 import fastify, { FastifyReply, FastifyRequest } from 'fastify'
 import { getChannelInfos } from './lib/youtube'
 import { getUserInfos } from './lib/github'
+import { getGuildInfo } from './lib/discord'
 
 export const app = fastify()
 
@@ -46,6 +47,27 @@ app.get(
   },
 )
 
+app.get(
+  '/discord/:guildId',
+  async (req: FastifyRequest<{ Params: discordParams }>, res: FastifyReply) => {
+    const guildId: string = req.params.guildId
+
+    if (!guildId) {
+      return res.status(400).send()
+    }
+
+    const data = await getGuildInfo(guildId)
+
+    if (!data || !isDiscordData(data)) {
+      res
+        .status(404)
+        .send({ success: false, guildId, message: 'No data found' })
+    }
+
+    res.send({ success: true, data })
+  },
+)
+
 function isGitHubData(obj: any): obj is githubData {
   return (
     typeof obj?.login === 'string' &&
@@ -57,4 +79,14 @@ function isGitHubData(obj: any): obj is githubData {
     typeof obj?.name === 'string'
     // only important informations
   )
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isDiscordData(obj: any): obj is discordData {
+  return (
+    typeof obj?.id === 'string' &&
+    typeof obj?.name === 'string' &&
+    typeof obj?.owner_id === 'string' &&
+    typeof obj?.approximate_member_count === 'number'
+  ) // only important informations
 }

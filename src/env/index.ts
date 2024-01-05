@@ -6,6 +6,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['dev', 'test', 'production']).default('dev'),
   YOUTUBE_API_KEY: z.string(),
   GITHUB_API_KEY: z.string(),
+  DISCORD_API_KEY: z.string(),
   PORT: z.coerce.number().default(3333),
 })
 

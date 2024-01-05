@@ -1,5 +1,6 @@
 import fastify, { FastifyReply, FastifyRequest } from 'fastify'
 import { getChannelInfos } from './lib/youtube'
+import { getUserInfos } from './lib/github'
 
 export const app = fastify()
 
@@ -23,3 +24,37 @@ app.get(
     res.send({ success: true, data })
   },
 )
+
+app.get(
+  '/github/:username',
+  async (req: FastifyRequest<{ Params: githubParams }>, res: FastifyReply) => {
+    const username: string = req.params.username
+
+    if (!username) {
+      return res.status(400).send()
+    }
+
+    const data = await getUserInfos(username)
+
+    if (!data || !isGitHubData(data)) {
+      return res
+        .status(404)
+        .send({ success: false, username, message: 'No data found' })
+    }
+
+    res.send({ success: true, data })
+  },
+)
+
+function isGitHubData(obj: any): obj is githubData {
+  return (
+    typeof obj?.login === 'string' &&
+    typeof obj?.id === 'number' &&
+    typeof obj?.node_id === 'string' &&
+    typeof obj?.url === 'string' &&
+    typeof obj?.html_url === 'string' &&
+    typeof obj?.followers === 'number' &&
+    typeof obj?.name === 'string'
+    // only important informations
+  )
+}

@@ -37,6 +37,10 @@ app.get(
 
     const data = await getUserInfos(username)
 
+    if (isGitHubData(data) === false) {
+      res.status(401).send({ success: false, message: 'Unauthorized' })
+    }
+
     if (!data || !isGitHubData(data)) {
       return res
         .status(404)
@@ -69,6 +73,12 @@ app.get(
 )
 
 function isGitHubData(obj: any): obj is githubData {
+  if (
+    obj?.message ===
+    'Error getting user information: Request failed with status code 401'
+  )
+    return false
+
   return (
     typeof obj?.login === 'string' &&
     typeof obj?.id === 'number' &&

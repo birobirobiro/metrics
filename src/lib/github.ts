@@ -17,6 +17,7 @@ export async function getUserInfos(username: string) {
     return response.data
   } catch (err: unknown) {
     if (err instanceof Error) {
+      console.log(err.message)
       return `Error getting user information: ${err.message}`
     } else {
       throw new Error('Unknown error getting user information')

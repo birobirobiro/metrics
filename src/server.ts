@@ -6,6 +6,4 @@ app
     host: '0.0.0.0',
     port: env.PORT,
   })
-  .then(() =>
-    console.log('HTTP Server is running at http://localhost:' + env.PORT),
-  )
+  .then(() => console.log(`HTTP Server is running`))

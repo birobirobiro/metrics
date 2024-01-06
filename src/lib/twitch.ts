@@ -1,9 +1,10 @@
 import { env } from '@/env'
 import axios from 'axios'
 import { z } from 'zod'
+import { absoluteUrl } from './utils'
 
 export async function getTwitchUserInfos(userid: string) {
-  const redirectUri = 'http://localhost:3333'
+  const redirectUri = absoluteUrl('/twitch')
   const auth = await axios.post(
     `https://id.twitch.tv/oauth2/token?client_id=${env.TWITCH_CLIENT_ID}&client_secret=${env.TWITCH_API_KEY}&grant_type=client_credentials&authorization_code=${redirectUri}`,
   )

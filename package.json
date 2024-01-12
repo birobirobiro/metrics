@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@rocketseat/eslint-config": "^2.1.0",
     "@types/node": "^20.10.6",
     "eslint": "^8.56.0",
     "googleapis": "52.1.0",

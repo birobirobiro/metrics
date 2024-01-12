@@ -6,11 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "node --trace-warnings build/server.js",
+    "start": "node --trace-warnings build/server.cjs",
     "build": "tsup src --out-dir build"
-  },
-  "engines": {
-    "node": ">=18.18.0 <19.0.0"
   },
   "author": "",
   "license": "ISC",

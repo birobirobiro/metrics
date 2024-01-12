@@ -6,7 +6,6 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['dev', 'test', 'production']).default('dev'),
   DEPLOY_URL: z.string().optional(),
   YOUTUBE_API_KEY: z.string(),
-  GITHUB_API_KEY: z.string(),
   DISCORD_API_KEY: z.string(),
   TWITCH_CLIENT_ID: z.string(),
   TWITCH_API_KEY: z.string(),

@@ -87,23 +87,23 @@ app.get(
 )
 
 app.get(
-  '/twitch/:userid',
+  '/twitch/:userId',
   async (
-    req: FastifyRequest<{ Params: { userid: string } }>,
+    req: FastifyRequest<{ Params: { userId: string } }>,
     res: FastifyReply,
   ) => {
-    const userid: string = req.params.userid
+    const userId: string = req.params.userId
 
-    if (!userid) {
+    if (!userId) {
       return res.status(400).send()
     }
 
-    const info = await getTwitchUserInfos(userid)
+    const info = await getTwitchUserInfos(userId)
 
     if (!info) {
       return res
         .status(404)
-        .send({ success: false, userid, message: 'No data found' })
+        .send({ success: false, userId, message: 'No data found' })
     }
 
     const data = info.data
@@ -111,7 +111,7 @@ app.get(
     if (!data || isTwitchData(data) === false) {
       return res
         .status(404)
-        .send({ success: false, userid, message: 'No data found' })
+        .send({ success: false, userId, message: 'No data found' })
     }
 
     res.send({

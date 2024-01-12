@@ -21,7 +21,7 @@ export async function getDiscordGuildInfo(guildId: string) {
       return handleErrorResponse(err, guildId)
     } else {
       console.error(err)
-      throw new Error('Unknown error getting guild information')
+      throw new Error('Unknown error getting discord guild information')
     }
   }
 }
@@ -30,7 +30,7 @@ function handleErrorResponse(err: Error | AxiosError, guildId: string): string {
   if (err.message === 'Request failed with status code 404') {
     return `Guild ${guildId} not found`
   } else {
-    return `Error getting guild information: ${err.message}`
+    return `Error getting discord guild information: ${err.message}`
   }
 }
 

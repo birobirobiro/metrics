@@ -15,9 +15,9 @@ export async function getGithubUserInfos(username: string) {
   } catch (err: unknown) {
     if (err instanceof Error || err instanceof AxiosError) {
       console.log(err.message)
-      return `Error getting user information: ${err.message}`
+      return `Error getting github user information: ${err.message}`
     } else {
-      throw new Error('Unknown error getting user information')
+      throw new Error('Unknown error getting github user information')
     }
   }
 }

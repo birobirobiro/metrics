@@ -33,6 +33,11 @@ export async function getYoutubeChannelInfos(channelId: string) {
 
         const data = youtubeDataSchema.parse(response.data)
 
+        if (!data) {
+          reject(new Error('No items found'))
+          return
+        }
+
         resolve(data)
       },
     )

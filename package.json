@@ -9,6 +9,9 @@
     "start": "node --trace-warnings build/server.js",
     "build": "tsup src --out-dir build"
   },
+  "engines": {
+  "node": ">=20.11.0"
+}
   "author": "",
   "license": "ISC",
   "devDependencies": {

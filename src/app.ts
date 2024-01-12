@@ -100,7 +100,7 @@ app.get(
 
     const info = await getTwitchUserInfos(userId)
 
-    if (!info) {
+    if (!info || typeof info !== 'object') {
       return res
         .status(404)
         .send({ success: false, userId, message: 'No data found' })
@@ -135,7 +135,6 @@ function isTwitchData(data: unknown) {
 
   return parsedData.success
 }
-
 function isGithubData(data: unknown) {
   const parsedData = githubDataSchema.safeParse(data)
 

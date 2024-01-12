@@ -8,7 +8,7 @@ const youtube = google.youtube({
 })
 
 export async function getYoutubeChannelInfos(channelId: string) {
-  console.log('Getting channel infos for channel:', channelId)
+  console.log('Getting youtube channel infos for channel:', channelId)
 
   return new Promise((resolve, reject) => {
     youtube.channels.list(
